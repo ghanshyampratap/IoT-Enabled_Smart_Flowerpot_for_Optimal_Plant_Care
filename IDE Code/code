@@ -1,1 +1,155 @@
+#include <Wire.h>
+#include <LiquidCrystal_I2C.h>
+#include <ESP8266WiFi.h>
+#include <ESP8266WebServer.h>
+#include "DHT.h"
+
+// === Wi-Fi CONFIG ===
+const char* ssid = "pratap";         // 🔁 Replace with your Wi-Fi name
+const char* password = "pratap@123"; // 🔁 Replace with your Wi-Fi password
+
+ESP8266WebServer server(80); // Web server on port 80
+
+// === LCD CONFIG ===
+LiquidCrystal_I2C lcd(0x27, 16, 2);
+
+// === DHT Sensor CONFIG ===
+#define DHTPIN 2       // GPIO2 = D4 on ESP8266
+#define DHTTYPE DHT11
+DHT dht(DHTPIN, DHTTYPE);
+
+// === Pin Assignments ===
+#define SOIL_MOISTURE_PIN A0
+#define RED_LED_PIN 14     // D5
+#define YELLOW_LED_PIN 12  // D6
+#define WHITE_LED_PIN 13   // D7
+#define BLUE_LED_PIN 15    // D8
+
+// === Sensor Values ===
+int soilValue;
+float temp, humid;
+String mood;
+float soilMoisturePercentage;
+
+void setup() {
+  Serial.begin(115200);
+
+  // LCD
+  lcd.init();
+  lcd.backlight();
+  lcd.setCursor(0, 0);
+  lcd.print("Smart Flowerpot");
+
+  // DHT
+  dht.begin();
+
+  // LED Pins
+  pinMode(RED_LED_PIN, OUTPUT);
+  pinMode(YELLOW_LED_PIN, OUTPUT);
+  pinMode(WHITE_LED_PIN, OUTPUT);
+  pinMode(BLUE_LED_PIN, OUTPUT);
+
+  digitalWrite(RED_LED_PIN, LOW);
+  digitalWrite(YELLOW_LED_PIN, LOW);
+  digitalWrite(WHITE_LED_PIN, LOW);
+  digitalWrite(BLUE_LED_PIN, LOW);
+
+  delay(2000);
+  lcd.clear();
+
+  // Wi-Fi
+  WiFi.begin(ssid, password);
+  Serial.print("Connecting to Wi-Fi");
+  lcd.setCursor(0, 0);
+  lcd.print("WiFi Connecting");
+
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
+  }
+  Serial.println("\nConnected!");
+  Serial.print("IP: ");
+  Serial.println(WiFi.localIP());
+
+  lcd.clear();
+  lcd.setCursor(0, 0);
+  lcd.print("IP:");
+  lcd.setCursor(0, 1);
+  lcd.print(WiFi.localIP());
+
+  delay(3000);
+  lcd.clear();
+
+  // Web Server route
+  server.on("/", handleRoot);
+  server.begin();
+  Serial.println("Web server started.");
+}
+
+void loop() {
+  server.handleClient();
+
+  soilValue = analogRead(SOIL_MOISTURE_PIN);
+  temp = dht.readTemperature();
+  humid = dht.readHumidity();
+
+  // Map soil value to percentage
+  if (soilValue > 900) { // If the value is too high (sensor saturated in water)
+    soilMoisturePercentage = 100;  // Set to 100% or another value
+  } else {
+    soilMoisturePercentage = (soilValue / 1023.0) * 100;
+  }
+
+  // Mood Logic based on Moisture
+  if (soilMoisturePercentage < 30)
+    mood = ":(";
+  else if (soilMoisturePercentage < 60)
+    mood = ":|";
+  else
+    mood = ":)";
+
+  // LED Control
+  digitalWrite(RED_LED_PIN, LOW);
+  digitalWrite(YELLOW_LED_PIN, LOW);
+  digitalWrite(WHITE_LED_PIN, LOW);
+  digitalWrite(BLUE_LED_PIN, LOW);
+
+  if (soilMoisturePercentage < 30)
+    digitalWrite(RED_LED_PIN, HIGH);  // Low moisture, RED LED
+  else if (soilMoisturePercentage < 60)
+    digitalWrite(YELLOW_LED_PIN, HIGH);  // Medium moisture, YELLOW LED
+  else if (soilMoisturePercentage < 80)
+    digitalWrite(WHITE_LED_PIN, HIGH);  // High moisture, WHITE LED
+  else
+    digitalWrite(BLUE_LED_PIN, HIGH);  // Saturated state, BLUE LED
+
+  // LCD Update
+  lcd.setCursor(0, 0);
+  lcd.print("M:");
+  lcd.print(soilMoisturePercentage);
+  lcd.print("% T:");
+  lcd.print(temp);
+
+  lcd.setCursor(0, 1);
+  lcd.print("H:");
+  lcd.print(humid);
+  lcd.print("% ");
+  lcd.print(mood);
+
+  delay(2000);
+}
+
+// === Web Page Handler ===
+void handleRoot() {
+  String html = "<html><head><meta http-equiv='refresh' content='5'/>"; // Auto-refresh every 5 sec
+  html += "<title>Smart Flowerpot</title></head><body>";
+  html += "<h1>Smart Flowerpot</h1>";
+  html += "<p><b>Soil Moisture:</b> " + String(soilMoisturePercentage) + "%</p>";  // Display percentage
+  html += "<p><b>Temperature:</b> " + String(temp) + "&#176;C</p>"; // &#176; is for degree symbol
+  html += "<p><b>Humidity:</b> " + String(humid) + "%</p>";
+  html += "<p><b>Mood:</b> " + mood + "</p>";
+  html += "<hr><p>Page auto-refreshes every 5 seconds.</p>";
+  html += "</body></html>";
+  server.send(200, "text/html", html);
+}
 
