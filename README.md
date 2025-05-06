@@ -29,7 +29,7 @@ The **Smart Flowerpot** is an IoT-based project designed to monitor soil moistur
 - **Soil Moisture Sensor** 💧  
 - **LEDs** (Red, Yellow, White, Blue) 💡  
 - **16x2 LCD with I2C Interface** 🖥️  
-- **Jumper Wires and Breadboard** 🔌  
+- **Jumper Wires ** 🔌  
 
 ## Web Interface 🌐
 
