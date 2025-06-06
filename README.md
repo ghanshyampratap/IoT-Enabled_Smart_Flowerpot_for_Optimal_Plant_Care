@@ -18,9 +18,13 @@ The **Smart Flowerpot** is an IoT-based project designed to monitor soil moistur
 
 - **LCD Display** 🖥️  
   Shows real-time moisture %, temperature, humidity, and mood face.
+  https://github.com/ghanshyampratap/IoT-Enabled_Smart_Flowerpot_for_Optimal_Plant_Care/blob/main/Task/1.jpg
+  
+  https://github.com/ghanshyampratap/IoT-Enabled_Smart_Flowerpot_for_Optimal_Plant_Care/blob/main/Task/5.png
 
 - **Web Interface** 🌐  
   Access data remotely through a hosted web server with auto-refresh every 5 seconds.
+  https://github.com/ghanshyampratap/IoT-Enabled_Smart_Flowerpot_for_Optimal_Plant_Care/blob/main/Task/2.1.jpg
 
 ## Components Used 🛠️
 
@@ -62,6 +66,7 @@ Auto-refresh updates data every 5 seconds.
 6. Open Serial Monitor to find the IP address.
 7. Access the web page using that IP on your browser.
 8. Watch the LCD and LED indicators for real-time feedback.
+https://github.com/ghanshyampratap/IoT-Enabled_Smart_Flowerpot_for_Optimal_Plant_Care/blob/main/Task/4.jpg.png
 
 ## Conclusion 🎉
 
