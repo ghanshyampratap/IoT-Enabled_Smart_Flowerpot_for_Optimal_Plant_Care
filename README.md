@@ -68,7 +68,5 @@ Auto-refresh updates data every 5 seconds.
 The **Smart Flowerpot** makes plant care easier and smarter. From real-time sensing to web-based monitoring, it's perfect for automation, learning, and keeping your greens happy! 🍀🌼
 
 ---
-![image](https://github.com/user-attachments/assets/7dce4cf5-ee02-477d-8a13-c06e7a757555)
-
 
 **Happy Gardening!** 🌸💚
